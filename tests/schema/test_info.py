@@ -1,3 +1,5 @@
+import dataclasses
+import json
 from typing import List, Optional
 
 import pytest
@@ -13,7 +15,7 @@ def test_info_has_the_correct_shape():
     @strawberry.type
     class Result:
         field_name: str
-        field_nodes: str
+        field: str
         operation: str
         path: str
         variable_values: str
@@ -29,7 +31,7 @@ def test_info_has_the_correct_shape():
                 path="".join([str(p) for p in info.path.as_list()]),
                 operation=str(info.operation),
                 field_name=info.field_name,
-                field_nodes=str(info.field_nodes),
+                field=json.dumps(dataclasses.asdict(info.field)),
                 variable_values=str(info.variable_values),
                 context_equal=info.context == my_context,
                 root_equal=info.root_value == root_value,
@@ -41,7 +43,7 @@ def test_info_has_the_correct_shape():
     query = """{
         hello {
             fieldName
-            fieldNodes
+            field
             contextEqual
             operation
             path
@@ -56,7 +58,19 @@ def test_info_has_the_correct_shape():
     assert not result.errors
     info = result.data["hello"]
     assert info.pop("operation").startswith("OperationDefinitionNode at")
-    assert info.pop("fieldNodes").startswith("[FieldNode at")
+    field = json.loads(info.pop("field"))
+    selections = {selection["name"] for selection in field.pop("selections")}
+    assert selections == {
+        "field",
+        "path",
+        "rootEqual",
+        "operation",
+        "contextEqual",
+        "variableValues",
+        "returnType",
+        "fieldName",
+    }
+    assert field == {"name": "hello", "directives": {}, "alias": None, "arguments": {}}
     assert info == {
         # TODO: abstract this (in future)
         "fieldName": "hello",
@@ -65,6 +79,60 @@ def test_info_has_the_correct_shape():
         "rootEqual": True,
         "variableValues": "{}",
         "returnType": "<class 'tests.schema.test_info.test_info_has_the_correct_shape.<locals>.Result'>",  # noqa
+    }
+
+
+def test_info_field_fragments():
+    @strawberry.type
+    class Result:
+        field: str
+
+    @strawberry.type
+    class Query:
+        @strawberry.field
+        def hello(self, info: Info[str, str]) -> Result:
+            return Result(field=json.dumps(dataclasses.asdict(info.field)))
+
+    schema = strawberry.Schema(query=Query)
+    query = """{
+        hello {
+            ... on Result {
+                f: field @include(if: true)
+            }
+            ...frag
+        }
+    }
+
+    fragment frag on Result {
+        field
+    }
+    """
+    result = schema.execute_sync(query)
+
+    assert not result.errors
+    info = result.data["hello"]
+    field = json.loads(info.pop("f"))
+    assert field == {
+        "name": "hello",
+        "directives": {},
+        "alias": None,
+        "arguments": {},
+        "selections": [
+            {
+                "type_condition": "Result",
+                "selections": [
+                    {
+                        "name": "field",
+                        "directives": {"include": {"if": True}},
+                        "alias": "f",
+                        "arguments": {},
+                        "selections": [],
+                    }
+                ],
+                "directives": {},
+            },
+            {"name": "frag", "directives": {}},
+        ],
     }
 
 
