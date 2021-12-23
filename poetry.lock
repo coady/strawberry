@@ -1184,15 +1184,14 @@ python-versions = "*"
 
 [[package]]
 name = "sanic-testing"
-version = "0.7.0"
+version = "0.8.2"
 description = "Core testing clients for Sanic"
 category = "dev"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-httpx = ">=0.18.0,<0.19.0"
-websockets = ">=9.0"
+httpx = ">=0.18,<0.22"
 
 [[package]]
 name = "sentinel"
@@ -1512,7 +1511,7 @@ sanic = ["sanic"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b57dcb1c9dfe719befa5857f0220636cdc2d4c1c072735d159c8f8c9461d14e0"
+content-hash = "044c3ad8dc0d9a35e14441e4d2898b735b667ddbc212279f20cfbd4b9eea9074"
 
 [metadata.files]
 aiofiles = [
@@ -2286,8 +2285,8 @@ sanic-routing = [
     {file = "sanic_routing-0.7.1-py3-none-any.whl", hash = "sha256:0c08f5f65a55fdca259d9149d89c39fd2377a651b408065fd643bdabdb6ba293"},
 ]
 sanic-testing = [
-    {file = "sanic-testing-0.7.0.tar.gz", hash = "sha256:8396507cdcc030f0b43a1b2419c04034be28bc6c466596e122e7bb407bb515b3"},
-    {file = "sanic_testing-0.7.0-py3-none-any.whl", hash = "sha256:3e600981d830731c6108c9c2f12c577800c061c92787a1b1c9c8fa6a80960843"},
+    {file = "sanic-testing-0.8.2.tar.gz", hash = "sha256:dd7123132e159281b14eb6434da811e2082165432aa2c523262e44b2c09c3be0"},
+    {file = "sanic_testing-0.8.2-py3-none-any.whl", hash = "sha256:f2c3679cd498351f095d8687a1cc6cc10558fd69e014d060ec21f3a020d5723b"},
 ]
 sentinel = [
     {file = "sentinel-0.3.0-py3-none-any.whl", hash = "sha256:bd8710dd26752039c668604f6be2aaf741b56f7811c5924a4dcdfd74359244f3"},
